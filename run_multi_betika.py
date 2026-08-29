@@ -675,13 +675,14 @@ def observe_rounds(frame, target_cycles, stake=None, cashout=AUTO_CASHOUT):
     return seen, seen * 2, pnl
 
 
-def process_account(pw, phone, password, rounds, stake, cashout=AUTO_CASHOUT, proxy=None):
+def process_account(pw, phone, password, rounds, stake, cashout=AUTO_CASHOUT, proxy=None, headless=False):
     log(f"▶ Account {phone} — logging in...")
     if proxy is None:
         proxy = DEFAULT_PROXY
     fp = make_fingerprint()
     browser, context, page, fp = new_session(
-        pw, minimize=MINIMIZE_BROWSER, fingerprint=fp, proxy=proxy)
+        pw, headless=headless, minimize=(not headless) and MINIMIZE_BROWSER,
+        fingerprint=fp, proxy=proxy)
     try:
         time.sleep(_human_delay("load"))
         page, frame = login_and_open_game(page, phone, password)

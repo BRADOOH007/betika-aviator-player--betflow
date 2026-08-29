@@ -248,7 +248,8 @@ class SchedulerEngine:
                 try:
                     res = multi.process_account(pw, phone, self._password,
                                                 self.rounds, self.stake,
-                                                cashout=self.cashout)
+                                                cashout=self.cashout,
+                                                headless=self.minimize)
                     if res and res.get("status") == "ok":
                         outcome = "ok"
                         cycles = res.get("cycles")
