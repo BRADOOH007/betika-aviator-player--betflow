@@ -1151,16 +1151,6 @@ class BetFlowAviatorProGUI:
                                         command=self._toggle_password_visibility)
         self._pw_toggle_btn.grid(row=1, column=2, padx=(0, 8), pady=6, sticky='e')
 
-    def _toggle_password_visibility(self):
-        """Eye toggle: show/hide the password characters."""
-        self._pw_visible = not self._pw_visible
-        if self._pw_visible:
-            self.password_entry.config(show='')
-            self._pw_toggle_btn.config(text='🙈')
-        else:
-            self.password_entry.config(show='●')
-            self._pw_toggle_btn.config(text='👁')
-
         # Phone list (paste as many numbers as you like, one per line) — the
         # primary account input for the auto-scheduler.
         tk.Label(creds_frame, text="Phone numbers\n(paste list, 1 per line)",
@@ -1193,6 +1183,8 @@ class BetFlowAviatorProGUI:
         except Exception:
             pass
         self.password_entry.bind('<FocusOut>', lambda e: self.save_config())
+
+
 
         # ── Auto Scheduler (daily 06:00-06:59, parallel workers) ─────────────
         sched_frame = tk.LabelFrame(left, text=" Auto Scheduler (06:00–06:59) ",
@@ -1680,6 +1672,16 @@ class BetFlowAviatorProGUI:
         # Keep updating if still processing
         if self.preloader and (status['is_processing'] or status['queue_size'] > 0):
             self.root.after(1000, self.update_preload_status)
+
+    def _toggle_password_visibility(self):
+        """Eye toggle: show/hide the password characters."""
+        self._pw_visible = not self._pw_visible
+        if self._pw_visible:
+            self.password_entry.config(show='')
+            self._pw_toggle_btn.config(text='🙈')
+        else:
+            self.password_entry.config(show='●')
+            self._pw_toggle_btn.config(text='👁')
 
     def save_config_on_change(self, event=None):
         if should_persist():
