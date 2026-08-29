@@ -30,6 +30,7 @@ Usage:
 """
 
 import sys
+import os
 import time
 import threading
 import random
@@ -301,7 +302,63 @@ def _minimize_window(browser):
         pass
 
 
+# ── First-run Firefox auto-install (so recipients don't need Python) ──────────
+_FIREFOX_READY = False
+
+def ensure_firefox_installed(log_cb=None):
+    """Ensure the Playwright Firefox browser binary is installed.
+
+    Returns True if a usable Firefox exists (or was just installed).
+    Runs the Playwright CLI install once; safe to call on every launch.
+    """
+    global _FIREFOX_READY
+    if _FIREFOX_READY:
+        return True
+
+    def _installed():
+        base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~/.cache")
+        d = os.path.join(base, "ms-playwright")
+        if not os.path.isdir(d):
+            return False
+        for name in os.listdir(d):
+            if name.startswith("firefox-") and os.path.isfile(
+                os.path.join(d, name, "firefox", "firefox.exe")):
+                return True
+        return False
+
+    if _installed():
+        _FIREFOX_READY = True
+        return True
+
+    if log_cb:
+        log_cb("[SETUP] Firefox browser not found — installing now (one-time, needs internet)…")
+    try:
+        from playwright.__main__ import main as _pw_cli
+        import sys as _sys
+        _old = _sys.argv
+        _sys.argv = ["playwright", "install", "firefox"]
+        try:
+            _pw_cli()
+        finally:
+            _sys.argv = _old
+        if _installed():
+            _FIREFOX_READY = True
+            if log_cb:
+                log_cb("[SETUP] Firefox installed successfully.")
+            return True
+        if log_cb:
+            log_cb("[SETUP] Firefox install finished but binary still not found.")
+        return False
+    except Exception as e:
+        if log_cb:
+            log_cb(f"[SETUP] Firefox install failed: {e}")
+        return False
+
+
 def new_session(pw, headless=False, minimize=False, fingerprint=None, proxy=None):
+    # First-run: make sure the Firefox browser binary is present.
+    if not ensure_firefox_installed(log_cb=log):
+        raise RuntimeError("Firefox browser unavailable and auto-install failed.")
     if fingerprint is None:
         fingerprint = make_fingerprint()
     vw, vh = fingerprint["viewport"]

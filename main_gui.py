@@ -1196,21 +1196,21 @@ class BetFlowAviatorProGUI:
 
         tk.Label(sched_frame, text="Workers", fg=FG, bg=BG,
                  font=('Arial', 9)).grid(row=0, column=0, padx=8, pady=4, sticky='w')
-        self.sched_workers_var = tk.StringVar(value="")
+        self.sched_workers_var = tk.StringVar(value="4")
         tk.Entry(sched_frame, textvariable=self.sched_workers_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=0, column=1, padx=8, pady=4, sticky='w')
 
         tk.Label(sched_frame, text="Rounds/acct", fg=FG, bg=BG,
                  font=('Arial', 9)).grid(row=1, column=0, padx=8, pady=4, sticky='w')
-        self.sched_rounds_var = tk.StringVar(value="")
+        self.sched_rounds_var = tk.StringVar(value="50")
         tk.Entry(sched_frame, textvariable=self.sched_rounds_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=1, column=1, padx=8, pady=4, sticky='w')
 
         tk.Label(sched_frame, text="Stake KES", fg=FG, bg=BG,
                  font=('Arial', 9)).grid(row=2, column=0, padx=8, pady=4, sticky='w')
-        self.sched_stake_var = tk.StringVar(value="")
+        self.sched_stake_var = tk.StringVar(value="10")
         tk.Entry(sched_frame, textvariable=self.sched_stake_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=2, column=1, padx=8, pady=4, sticky='w')
@@ -1242,7 +1242,7 @@ class BetFlowAviatorProGUI:
 
         tk.Label(sched_frame, text="Cashout odds", fg=FG, bg=BG,
                  font=('Arial', 9)).grid(row=7, column=0, padx=8, pady=2, sticky='w')
-        self.sched_cashout_var = tk.StringVar(value="")
+        self.sched_cashout_var = tk.StringVar(value="1.01")
         tk.Entry(sched_frame, textvariable=self.sched_cashout_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=7, column=1, padx=8, pady=2, sticky='w')
@@ -1656,6 +1656,19 @@ class BetFlowAviatorProGUI:
         # Keep updating if still processing
         if self.preloader and (status['is_processing'] or status['queue_size'] > 0):
             self.root.after(1000, self.update_preload_status)
+
+        # First-run: ensure the Playwright Firefox browser is present.
+        # Auto-installs it (one-time) so recipients don't need Python.
+        def _check_browser():
+            try:
+                import run_multi_betika as rm
+                if rm.ensure_firefox_installed(log_cb=self.log):
+                    self.log("✓ Firefox browser ready.")
+                else:
+                    self.log("✗ Firefox missing — auto-install failed. Runs will error until it is installed.")
+            except Exception as e:
+                self.log(f"Browser check error: {e}")
+        threading.Thread(target=_check_browser, daemon=True).start()
 
     def _toggle_password_visibility(self):
         """Eye toggle: show/hide the password characters."""
