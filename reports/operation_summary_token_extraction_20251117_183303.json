@@ -1,0 +1,11 @@
+{
+  "operation": "Token Extraction",
+  "generated_at": "2025-11-17 18:33:03 EAT",
+  "time_of_day": "Evening",
+  "report_file": "token_extraction_report_20251117_1833.txt",
+  "summary": {
+    "total_accounts": 501,
+    "successful": 466,
+    "failed": 35
+  }
+}

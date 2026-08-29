@@ -1,0 +1,15 @@
+{
+  "train_accuracy": 1.0,
+  "test_accuracy": 0.6923076923076923,
+  "total_samples": 65,
+  "feature_count": 200,
+  "class_count": 4,
+  "class_names": [
+    "BETTING BUTTONS",
+    "HAS_FREEBET",
+    "LOGIN AVIATOR",
+    "NO_FREEBET"
+  ],
+  "training_date": "2025-12-09T13:20:18.147691",
+  "model_type": "Ensemble (RF+GB)"
+}

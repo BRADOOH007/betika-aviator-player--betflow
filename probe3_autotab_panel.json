@@ -1,0 +1,203 @@
+{
+  "tag": "app-bet-control",
+  "cls": "bet-control double-bet",
+  "txt": "Bet\nAuto\n100\n250\n1,000\n25,000\nBet\n10.00\n",
+  "children": [
+    {
+      "tag": "div",
+      "cls": "controls",
+      "txt": "Bet\nAuto\n100\n250\n1,000\n25,000\nBet\n10.00\n",
+      "children": [
+        {
+          "tag": "div",
+          "cls": "controls-content-top",
+          "txt": "Bet\nAuto\n100\n250\n1,000\n25,000\nBet\n10.00\n",
+          "children": [
+            {
+              "tag": "div",
+              "cls": "navigation-wrapper",
+              "txt": "Bet\nAuto",
+              "children": [
+                {
+                  "tag": "app-navigation-switcher",
+                  "cls": "navigation ng-untouched ng-valid ng-star-inserted ng-dirty",
+                  "txt": "Bet\nAuto",
+                  "children": [
+                    {
+                      "tag": "div",
+                      "cls": "navigation-switcher",
+                      "txt": "Bet\nAuto",
+                      "children": [
+                        {
+                          "tag": "button",
+                          "cls": "tab ng-star-inserted",
+                          "txt": "Bet"
+                        },
+                        {
+                          "tag": "button",
+                          "cls": "tab ng-star-inserted active",
+                          "txt": "Auto"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "cls": "first-row auto-game-feature",
+              "txt": "100\n250\n1,000\n25,000\nBet\n10.00\nKES",
+              "children": [
+                {
+                  "tag": "div",
+                  "cls": "bet-block",
+                  "txt": "100\n250\n1,000\n25,000",
+                  "children": [
+                    {
+                      "tag": "app-spinner",
+                      "cls": "spinner ng-untouched ng-valid ng-dirty",
+                      "txt": "",
+                      "children": [
+                        {
+                          "tag": "div",
+                          "cls": "spinner big",
+                          "txt": ""
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "cls": "bets-opt-list",
+                      "txt": "100\n250\n1,000\n25,000",
+                      "children": [
+                        {
+                          "tag": "button",
+                          "cls": "btn btn-secondary btn-sm bet-opt ng-star-inserted",
+                          "txt": "100"
+                        },
+                        {
+                          "tag": "button",
+                          "cls": "btn btn-secondary btn-sm bet-opt ng-star-inserted",
+                          "txt": "250"
+                        },
+                        {
+                          "tag": "button",
+                          "cls": "btn btn-secondary btn-sm bet-opt ng-star-inserted",
+                          "txt": "1,000"
+                        },
+                        {
+                          "tag": "button",
+                          "cls": "btn btn-secondary btn-sm bet-opt ng-star-inserted",
+                          "txt": "25,000"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "cls": "buttons-block",
+                  "txt": "Bet\n10.00\nKES",
+                  "children": [
+                    {
+                      "tag": "button",
+                      "cls": "btn btn-success bet ng-star-inserted",
+                      "txt": "Bet\n10.00\nKES",
+                      "children": [
+                        {
+                          "tag": "span",
+                          "cls": "d-flex flex-column justify-content-center align-items-center",
+                          "txt": "Bet\n10.00\nKES"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "cls": "w-100 border-line",
+          "txt": ""
+        },
+        {
+          "tag": "div",
+          "cls": "controls-content-bottom",
+          "txt": "Auto bet\nAuto Cash Out",
+          "children": [
+            {
+              "tag": "div",
+              "cls": "second-row",
+              "txt": "Auto bet\nAuto Cash Out",
+              "children": [
+                {
+                  "tag": "div",
+                  "cls": "auto-bet-wrapper",
+                  "txt": "Auto bet",
+                  "children": [
+                    {
+                      "tag": "div",
+                      "cls": "auto-bet",
+                      "txt": "Auto bet",
+                      "children": [
+                        {
+                          "tag": "label",
+                          "cls": "ng-star-inserted",
+                          "txt": "Auto bet"
+                        },
+                        {
+                          "tag": "app-ui-switcher",
+                          "cls": "ng-untouched ng-pristine ng-valid ng-star-inserted",
+                          "txt": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "cls": "cashout-block",
+                  "txt": "Auto Cash Out",
+                  "children": [
+                    {
+                      "tag": "div",
+                      "cls": "cash-out-switcher",
+                      "txt": "Auto Cash Out",
+                      "children": [
+                        {
+                          "tag": "label",
+                          "cls": "",
+                          "txt": "Auto Cash Out"
+                        },
+                        {
+                          "tag": "app-ui-switcher",
+                          "cls": "ng-untouched ng-pristine ng-valid",
+                          "txt": ""
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "cls": "cashout-spinner-wrapper",
+                      "txt": "",
+                      "children": [
+                        {
+                          "tag": "div",
+                          "cls": "cashout-spinner disabled",
+                          "txt": ""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

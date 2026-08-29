@@ -1,0 +1,11 @@
+{
+  "strategy_weights": {
+    "conservative": 0.4,
+    "balanced": 0.4,
+    "aggressive": 0.2
+  },
+  "performance_metrics": {},
+  "min_confidence": 0.7,
+  "learning_examples_count": 0,
+  "last_updated": "2025-10-25T13:51:32.109301"
+}

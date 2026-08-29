@@ -1,0 +1,283 @@
+{
+  "site_name": "Odibets",
+  "base_url": "https://odibets.com",
+  "last_updated": "2025-01-03",
+  "page_structures": {
+    "odileague": {
+      "url_pattern": "/odileague",
+      "layout": {
+        "left_sidebar": "League selection (EL English League, SL Spanish League, etc.)",
+        "center_top": "Time tabs (LIVE, Results, Standings)",
+        "center_middle": "Match list with 1X2 odds and OV/UN 2.5 odds",
+        "center_bottom": "More matches",
+        "right_sidebar": "Betslip area",
+        "top_bar": "Main navigation (OdiLeague highlighted in green)"
+      },
+      "key_elements": {
+        "match_row": {
+          "description": "Each match shown as table row",
+          "selectors": [
+            "//tr[contains(@class, 'match')]",
+            "//div[contains(@class, 'match-row')]",
+            "//table//tr[.//button or .//span[contains(@class, 'odd')]]"
+          ]
+        },
+        "1.88_odds": {
+          "description": "Target odds for rollover - appears in OV/UN columns",
+          "selectors": [
+            "//*[text()='1.88']",
+            "//button[contains(@class, 'odd') and text()='1.88']",
+            "//span[contains(@class, 'odd') and text()='1.88']"
+          ],
+          "parent_pattern": "Contained within match row, clickable button"
+        },
+        "over_button": {
+          "description": "Over 2.5 odds button",
+          "selectors": [
+            "//button[text()='1.88' and ancestor::tr]",
+            "//td[.//*[text()='1.88']]//button[position()=1]",
+            "//span[text()='1.88']/parent::button"
+          ],
+          "context": "Usually in OV column"
+        },
+        "under_button": {
+          "description": "Under 2.5 odds button",
+          "selectors": [
+            "//button[text()='1.88' and ancestor::tr and position()>1]",
+            "//td[.//*[text()='1.88']]//button[position()=2]",
+            "//span[text()='1.88']/following-sibling::button"
+          ],
+          "context": "Usually in UN column, same row as Over"
+        },
+        "ov_un_tab": {
+          "description": "OV/UN 2.5 betting market tab",
+          "selectors": [
+            "//button[contains(text(), 'OV/UN 2.5')]",
+            "//a[contains(text(), 'OV/UN 2.5')]",
+            "//*[@class='betting-market']//*[contains(text(), 'OV/UN 2.5')]"
+          ],
+          "action": "Click to filter matches by OV/UN market"
+        },
+        "betslip": {
+          "description": "Right sidebar showing selected bets",
+          "selectors": [
+            "//div[contains(@class, 'betslip')]",
+            "//div[contains(@id, 'betslip')]",
+            "//div[contains(@class, 'bet-slip')]"
+          ]
+        },
+        "stake_input": {
+          "description": "Stake amount input field in betslip",
+          "selectors": [
+            "//input[@type='number']",
+            "//input[contains(@placeholder, 'Stake') or contains(@name, 'stake')]",
+            "//div[@class='betslip']//input"
+          ]
+        },
+        "place_bet_button": {
+          "description": "Place Bet button in betslip",
+          "selectors": [
+            "//button[contains(text(), 'Place Bet')]",
+            "//button[contains(text(), 'BET')]",
+            "//div[@class='betslip']//button[contains(@class, 'place')]"
+          ],
+          "importance": "CRITICAL - must be clicked to place bet"
+        },
+        "close_popup_button": {
+          "description": "Close success/error popup after bet",
+          "selectors": [
+            "//button[contains(@class, 'close')]",
+            "//button[text()='×' or text()='Close' or text()='OK']",
+            "//div[contains(@class, 'popup')]//button",
+            "//div[contains(@class, 'modal')]//button[contains(@class, 'close')]"
+          ],
+          "after_action": "After clicking Place Bet button"
+        },
+        "clear_betslip": {
+          "description": "Remove all button to clear betslip",
+          "selectors": [
+            "//button[contains(text(), 'Remove all')]",
+            "//button[contains(text(), 'Clear')]",
+            "//div[@class='betslip']//button[contains(@class, 'clear')]"
+          ]
+        }
+      }
+    },
+    "promotions": {
+      "url_pattern": "/promotions",
+      "layout": {
+        "top_bar": "Main navigation green bar",
+        "content_area": "Grid of promotional cards",
+        "right_sidebar": "Betslip (if visible)"
+      },
+      "key_elements": {
+        "supa5_card": {
+          "description": "OdiLeague Supa5 promotional card",
+          "selectors": [
+            "//div[contains(text(), 'OdiLeague Supa5')]",
+            "//div[contains(text(), 'Supa5')]//ancestor::div[contains(@class, 'card')]",
+            "//*[contains(text(), 'Place at least 5 bets')]//ancestor::div"
+          ]
+        },
+        "play_now_button": {
+          "description": "Play Now button on Supa5 card",
+          "selectors": [
+            "//div[contains(@class, 'supa5')]//button[contains(text(), 'Play Now')]",
+            "//*[contains(text(), 'Supa5')]//..//button[contains(text(), 'Play Now')]",
+            "//div[.//*[contains(text(), 'Place at least 5 bets')]]//button[contains(text(), 'Play')]"
+          ],
+          "importance": "CRITICAL - activates Supa5 bonus"
+        },
+        "learn_more_link": {
+          "description": "Learn more link on promo cards",
+          "selectors": [
+            "//a[contains(text(), 'Learn more')]",
+            "//*[contains(text(), 'Learn more')]"
+          ]
+        }
+      }
+    },
+    "login": {
+      "url_pattern": "/login or homepage",
+      "key_elements": {
+        "phone_input": {
+          "selectors": [
+            "//input[@type='tel' or @name='phone' or @placeholder='*Phone']",
+            "//input[contains(@placeholder, 'Phone') or contains(@placeholder, 'number')]",
+            "input[type='tel']",
+            "input[name='phone']"
+          ]
+        },
+        "password_input": {
+          "selectors": [
+            "//input[@type='password']",
+            "input[type='password']"
+          ]
+        },
+        "login_submit_button": {
+          "description": "Big green 'Login to Odibets' button in popup",
+          "selectors": [
+            "//button[contains(text(), 'Login to Odibets')]",
+            "//button[contains(text(), 'LOGIN TO ODIBETS')]",
+            "//button[@type='submit']",
+            "//button[contains(@class, 'submit') or contains(@class, 'login')]",
+            "button[type='submit']",
+            "button.login-submit",
+            "//button[contains(text(), 'Login') and contains(@class, 'btn')]"
+          ],
+          "importance": "CRITICAL - must be clicked to complete login",
+          "position": "Bottom right of login popup"
+        }
+      }
+    },
+    "logout": {
+      "url_pattern": "any page when logged in",
+      "description": "User menu and logout flow",
+      "key_elements": {
+        "profile_icon": {
+          "description": "User profile icon/avatar to open menu",
+          "selectors": [
+            "//button[contains(@aria-label, 'menu') or contains(@aria-label, 'user')]",
+            "//div[@class='profile']//button",
+            "//button[contains(@class, 'profile')]",
+            "//button[contains(@class, 'user-menu')]",
+            "header button:last-child",
+            ".header button:last-child",
+            "//*[@id='user-menu']//button",
+            "//button[near(//*[contains(text(), 'Balance')])][1]"
+          ],
+          "position": "Top right header area",
+          "action": "Click to open user menu"
+        },
+        "logout_button": {
+          "description": "Logout link/button in user menu dropdown",
+          "selectors": [
+            "//*[contains(text(), 'Logout') or contains(text(), 'Log out')]",
+            "//*[contains(text(), 'LOGOUT')]",
+            "//a[contains(text(), 'Logout')]",
+            "//button[contains(text(), 'Logout')]",
+            "//*[contains(@class, 'logout')]",
+            "//a[@href*='logout']"
+          ],
+          "importance": "CRITICAL - must be clicked to logout",
+          "position": "In user menu dropdown after clicking profile icon",
+          "workflow": [
+            "1. Click profile icon",
+            "2. Wait for menu dropdown",
+            "3. Click Logout button"
+          ]
+        }
+      }
+    },
+    "general": {
+      "navigation": {
+        "promotions_link": {
+          "selectors": [
+            "//a[contains(text(), 'Promotions')]",
+            "//*[@href='/promotions']"
+          ]
+        },
+        "odileague_link": {
+          "selectors": [
+            "//a[contains(text(), 'OdiLeague')]",
+            "//*[@href='/odileague']"
+          ]
+        }
+      },
+      "balance_display": {
+        "selectors": [
+          "//*[contains(text(), 'Balance KSh') or contains(text(), 'KES')]",
+          "//span[contains(@class, 'balance')]"
+        ]
+      }
+    }
+  },
+  "learned_patterns": {
+    "workflow": {
+      "rollover": {
+        "steps": [
+          "1. Navigate to /odileague",
+          "2. Click OV/UN 2.5 tab",
+          "3. Find match with 1.88/1.88 odds",
+          "4. Click Over 1.88 for Account A",
+          "5. Enter stake in betslip",
+          "6. Click Place Bet",
+          "7. Wait for success popup",
+          "8. Close popup",
+          "9. Clear betslip",
+          "10. Repeat for Under on Account B"
+        ]
+      },
+      "supa5": {
+        "steps": [
+          "1. Navigate to /promotions",
+          "2. Find OdiLeague Supa5 card",
+          "3. Click Play Now (CRITICAL - activates bonus)",
+          "4. Navigate to /odileague",
+          "5. Place 6 bets (Over + Under pairs)",
+          "6. Each bet: 50 KES, 1.88 odds"
+        ]
+      }
+    },
+    "common_issues": {
+      "popup_after_login": {
+        "description": "Popup appears after login",
+        "fix": "Press Escape or find close button",
+        "selectors": [
+          "//button[contains(@class, 'close')]",
+          "//div[contains(@class, 'popup')]//button"
+        ]
+      },
+      "betslip_not_clearing": {
+        "description": "Betslip retains previous bet",
+        "fix": "Explicitly click Remove all before next bet",
+        "verification": "Check betslip count is 0"
+      },
+      "odds_change_before_click": {
+        "description": "Odds change in milliseconds",
+        "fix": "Use fastest possible click, verify bet confirms"
+      }
+    }
+  }
+}
+

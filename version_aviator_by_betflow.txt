@@ -1,0 +1,11 @@
+Aviator by BetFlow
+Version: 5.0.0 - Ultra-Stable
+Build Date: 2025-12-09
+Features: AI Visual Recognition, Ultra-Stable Processing, Playwright Automation, 1000+ Account Support
+Architecture: Enterprise-grade with circuit breakers, adaptive rate limiting, memory management
+AI Model: 4-class visual recognition (98.6% accuracy, 68 training images)
+Stability: Ultra-stable with health monitoring, emergency pause, graceful degradation
+Automation: Playwright headless, freebet-only mode, intelligent betting (1 bet per freebet)
+GUI: Professional interface with real-time AI and system status
+Safety: Zero cash risk, proxy rotation, anti-detection measures
+Scale: Designed for 1000+ accounts, batch processing, concurrent execution

@@ -1,0 +1,20 @@
+# BetFlow Pro - Build Requirements
+# Install these before building the EXE: pip install -r requirements_build.txt
+
+# Core dependencies (runtime)
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# Build dependencies
+pyinstaller>=6.0.0
+pyinstaller-hooks-contrib>=2024.0
+
+# Optional but recommended
+certifi>=2023.0.0
+charset-normalizer>=3.0.0
+idna>=3.0
+urllib3>=2.0.0
+

@@ -1,0 +1,13 @@
+{
+  "operation": "Balance Check",
+  "generated_at": "2025-11-17 21:08:09 EAT",
+  "time_of_day": "Night",
+  "report_file": "balance_report_20251117_2108.txt",
+  "summary": {
+    "total_accounts": 501,
+    "successful": 430,
+    "failed": 71,
+    "total_balance": 138976.56,
+    "total_bonus": 11485
+  }
+}
