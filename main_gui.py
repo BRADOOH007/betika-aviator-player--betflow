@@ -1170,18 +1170,6 @@ class BetFlowAviatorProGUI:
                   relief='flat', cursor='hand2', bd=0, height=1,
                   activebackground='#1976D2').pack(fill='x')
 
-        # Populate saved credentials
-        try:
-            import base64
-            saved_pass = self.config.get('aviator_pass', '')
-            if saved_pass:
-                self.password_entry.insert(0, base64.b64decode(saved_pass.encode()).decode())
-            saved_list = self.config.get('aviator_phone_list', '')
-            if saved_list:
-                self.phone_text.delete(1.0, tk.END)
-                self.phone_text.insert(1.0, saved_list)
-        except Exception:
-            pass
         self.password_entry.bind('<FocusOut>', lambda e: self.save_config())
 
 
@@ -1195,21 +1183,21 @@ class BetFlowAviatorProGUI:
 
         tk.Label(sched_frame, text="Workers", fg=FG, bg=BG,
                  font=('Arial', 9)).grid(row=0, column=0, padx=8, pady=4, sticky='w')
-        self.sched_workers_var = tk.StringVar(value="4")
+        self.sched_workers_var = tk.StringVar(value="")
         tk.Entry(sched_frame, textvariable=self.sched_workers_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=0, column=1, padx=8, pady=4, sticky='w')
 
         tk.Label(sched_frame, text="Rounds/acct", fg=FG, bg=BG,
                  font=('Arial', 9)).grid(row=1, column=0, padx=8, pady=4, sticky='w')
-        self.sched_rounds_var = tk.StringVar(value="50")
+        self.sched_rounds_var = tk.StringVar(value="")
         tk.Entry(sched_frame, textvariable=self.sched_rounds_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=1, column=1, padx=8, pady=4, sticky='w')
 
         tk.Label(sched_frame, text="Stake KES", fg=FG, bg=BG,
                  font=('Arial', 9)).grid(row=2, column=0, padx=8, pady=4, sticky='w')
-        self.sched_stake_var = tk.StringVar(value="10")
+        self.sched_stake_var = tk.StringVar(value="")
         tk.Entry(sched_frame, textvariable=self.sched_stake_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=2, column=1, padx=8, pady=4, sticky='w')
@@ -1241,7 +1229,7 @@ class BetFlowAviatorProGUI:
 
         tk.Label(sched_frame, text="Cashout odds", fg=FG, bg=BG,
                  font=('Arial', 9)).grid(row=7, column=0, padx=8, pady=2, sticky='w')
-        self.sched_cashout_var = tk.StringVar(value="1.01")
+        self.sched_cashout_var = tk.StringVar(value="")
         tk.Entry(sched_frame, textvariable=self.sched_cashout_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=7, column=1, padx=8, pady=2, sticky='w')
@@ -1287,24 +1275,7 @@ class BetFlowAviatorProGUI:
         self._stop_btn = stop_btn
         self._reset_btn = reset_btn
 
-        # Restore scheduler settings from config
-        try:
-            if self.config.get('sched_workers'):
-                self.sched_workers_var.set(str(self.config['sched_workers']))
-            if self.config.get('sched_rounds'):
-                self.sched_rounds_var.set(str(self.config['sched_rounds']))
-            if self.config.get('sched_stake'):
-                self.sched_stake_var.set(str(self.config['sched_stake']))
-            if self.config.get('sched_auto'):
-                self.sched_auto_var.set(bool(self.config['sched_auto']))
-            if self.config.get('sched_real'):
-                self.sched_real_var.set(bool(self.config['sched_real']))
-            if self.config.get('sched_cashout'):
-                self.sched_cashout_var.set(str(self.config['sched_cashout']))
-            if self.config.get('sched_minimize') is not None:
-                self.sched_minimize_var.set(bool(self.config['sched_minimize']))
-        except Exception:
-            pass
+        # No auto-fill: scheduler fields stay empty and wait for user input.
 
 
         stats = tk.Frame(left, bg=BG)
