@@ -1,0 +1,168 @@
+5182 INFO: PyInstaller: 6.16.0, contrib hooks: 2025.9
+5190 INFO: Python: 3.13.1
+5413 INFO: Platform: Windows-11-10.0.26200-SP0
+5415 INFO: Python environment: C:\Program Files\Python313
+5418 INFO: wrote C:\Users\Home\Desktop\ALL FILES\aviator betika sekentow\aviatorx\BetikaAviatorPlayerV3.spec
+11666 INFO: Module search paths (PYTHONPATH):
+['C:\\Users\\Home\\Desktop\\ALL FILES\\aviator betika sekentow\\aviatorx',
+ 'C:\\Program Files\\Python313\\python313.zip',
+ 'C:\\Program Files\\Python313\\DLLs',
+ 'C:\\Program Files\\Python313\\Lib',
+ 'C:\\Program Files\\Python313',
+ 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages',
+ 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\win32',
+ 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\win32\\lib',
+ 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\Pythonwin',
+ 'C:\\Program Files\\Python313\\Lib\\site-packages',
+ 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\setuptools\\_vendor',
+ 'C:\\Users\\Home\\Desktop\\ALL FILES\\aviator betika sekentow\\aviatorx']
+19441 INFO: Appending 'datas' from .spec
+19444 INFO: checking Analysis
+19445 INFO: Building Analysis because Analysis-00.toc is non existent
+19445 INFO: Looking for Python shared library...
+19446 INFO: Using Python shared library: C:\Program Files\Python313\python313.dll
+19446 INFO: Running Analysis Analysis-00.toc
+19447 INFO: Target bytecode optimization level: 0
+19448 INFO: Initializing module dependency graph...
+19452 INFO: Initializing module graph hook caches...
+19565 INFO: Analyzing modules for base_library.zip ...
+26747 INFO: Processing standard module hook 'hook-encodings.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+35359 INFO: Processing standard module hook 'hook-pickle.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+39185 INFO: Processing standard module hook 'hook-heapq.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+41086 INFO: Caching module dependency graph...
+41291 INFO: Analyzing C:\Users\Home\Desktop\ALL FILES\aviator betika sekentow\aviatorx\main_gui.py
+42060 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+42062 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+43054 INFO: Processing standard module hook 'hook-_tkinter.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+43409 INFO: Processing standard module hook 'hook-urllib3.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+44305 INFO: Processing standard module hook 'hook-platform.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+44402 INFO: Processing standard module hook 'hook-_ctypes.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+44906 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+44913 INFO: SetuptoolsInfo: initializing cached setuptools info...
+60192 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+60571 INFO: Processing standard module hook 'hook-xml.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+67413 INFO: Processing standard module hook 'hook-charset_normalizer.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+68189 INFO: Processing standard module hook 'hook-cryptography.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+72982 INFO: hook-cryptography: cryptography does not seem to be using dynamically linked OpenSSL.
+76350 INFO: Processing standard module hook 'hook-bcrypt.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+77391 INFO: Processing standard module hook 'hook-certifi.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+79881 INFO: Processing standard module hook 'hook-PIL.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+81068 INFO: Processing standard module hook 'hook-PIL.Image.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+85260 INFO: Processing standard module hook 'hook-numpy.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+90828 INFO: Processing standard module hook 'hook-sysconfig.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+98428 INFO: Processing standard module hook 'hook-difflib.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+102021 INFO: Processing standard module hook 'hook-psutil.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+118767 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+120294 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+122546 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+122901 INFO: Processing standard module hook 'hook-playwright.sync_api.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\playwright\\_impl\\__pyinstaller'
+130201 INFO: Processing standard module hook 'hook-cv2.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+135823 INFO: Processing standard module hook 'hook-zoneinfo.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+136207 INFO: Processing standard module hook 'hook-pytz.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+145606 INFO: Processing standard module hook 'hook-pycparser.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+149413 INFO: Processing standard module hook 'hook-setuptools.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+149562 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+149833 INFO: Processing pre-safe-import-module hook 'hook-jaraco.functools.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+149837 INFO: Setuptools: 'jaraco.functools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.functools'!
+149911 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+149914 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+153202 INFO: Processing pre-safe-import-module hook 'hook-jaraco.text.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+153207 INFO: Setuptools: 'jaraco.text' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.text'!
+153285 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+153294 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+153305 INFO: Processing pre-safe-import-module hook 'hook-jaraco.context.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+153309 INFO: Setuptools: 'jaraco.context' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.context'!
+153375 INFO: Processing pre-safe-import-module hook 'hook-backports.tarfile.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+153377 INFO: Setuptools: 'backports.tarfile' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.backports.tarfile'!
+154106 INFO: Processing standard module hook 'hook-backports.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+154854 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+154858 INFO: Setuptools: 'importlib_metadata' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.importlib_metadata'!
+155113 INFO: Processing standard module hook 'hook-setuptools._vendor.importlib_metadata.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+155144 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+155162 INFO: Setuptools: 'zipp' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.zipp'!
+157669 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+157673 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+161124 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+173271 INFO: Processing standard module hook 'hook-pygments.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+185480 INFO: Processing standard module hook 'hook-py.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+189351 INFO: Processing standard module hook 'hook-pytest.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+191456 INFO: Processing standard module hook 'hook-pkg_resources.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+194171 INFO: Processing pre-safe-import-module hook 'hook-platformdirs.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+194231 INFO: Processing standard module hook 'hook-platformdirs.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+197733 INFO: Processing standard module hook 'hook-anyio.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+218422 INFO: Processing standard module hook 'hook-selenium.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+220646 INFO: Processing standard module hook 'hook-xml.dom.domreg.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+221765 INFO: Processing standard module hook 'hook-websockets.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+225112 INFO: Analyzing hidden import 'playwright._impl.__pyinstaller'
+225116 INFO: Analyzing hidden import 'playwright._impl._async_base'
+225146 INFO: Analyzing hidden import 'playwright._impl._path_utils'
+225151 INFO: Analyzing hidden import 'playwright.async_api'
+225171 INFO: Processing standard module hook 'hook-playwright.async_api.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\playwright\\_impl\\__pyinstaller'
+227189 INFO: Processing module hooks (post-graph stage)...
+230688 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+241562 INFO: Processing standard module hook 'hook-_tkinter.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks'
+241570 INFO: Processing standard module hook 'hook-tzdata.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+245084 INFO: Performing binary vs. data reclassification (2517 entries)
+247362 INFO: Looking for ctypes DLLs
+247949 INFO: Analyzing run-time hooks ...
+247979 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\rthooks'
+247998 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\rthooks'
+248010 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\rthooks'
+248022 INFO: Including run-time hook 'pyi_rth_cryptography_openssl.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\_pyinstaller_hooks_contrib\\rthooks'
+248027 INFO: Including run-time hook 'pyi_rth_setuptools.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\rthooks'
+248033 INFO: Including run-time hook 'pyi_rth_pkgres.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\rthooks'
+248070 INFO: Including run-time hook 'pyi_rth__tkinter.py' from 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\hooks\\rthooks'
+248446 INFO: Creating base_library.zip...
+248547 INFO: Looking for dynamic libraries
+C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\building\build_main.py:227: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__(package)
+257147 INFO: Extra DLL search directories (AddDllDirectory): ['C:\\Program Files\\Python313\\Lib\\site-packages\\numpy.libs', 'C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\cv2\\../../x64/vc17/bin']
+257148 INFO: Extra DLL search directories (PATH): ['C:\\Users\\Home\\AppData\\Roaming\\Python\\Python313\\site-packages\\cv2\\../../x64/vc17/bin']
+262178 INFO: Warnings written to C:\Users\Home\Desktop\ALL FILES\aviator betika sekentow\aviatorx\build\BetikaAviatorPlayerV3\warn-BetikaAviatorPlayerV3.txt
+262838 INFO: Graph cross-reference written to C:\Users\Home\Desktop\ALL FILES\aviator betika sekentow\aviatorx\build\BetikaAviatorPlayerV3\xref-BetikaAviatorPlayerV3.html
+263272 INFO: checking PYZ
+263273 INFO: Building PYZ because PYZ-00.toc is non existent
+263274 INFO: Building PYZ (ZlibArchive) C:\Users\Home\Desktop\ALL FILES\aviator betika sekentow\aviatorx\build\BetikaAviatorPlayerV3\PYZ-00.pyz
+270997 INFO: Building PYZ (ZlibArchive) C:\Users\Home\Desktop\ALL FILES\aviator betika sekentow\aviatorx\build\BetikaAviatorPlayerV3\PYZ-00.pyz completed successfully.
+272344 INFO: checking PKG
+272351 INFO: Building PKG because PKG-00.toc is non existent
+272351 INFO: Building PKG (CArchive) BetikaAviatorPlayerV3.pkg
+389058 INFO: Building PKG (CArchive) BetikaAviatorPlayerV3.pkg completed successfully.
+389228 INFO: Bootloader C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+389233 INFO: checking EXE
+389234 INFO: Building EXE because EXE-00.toc is non existent
+389234 INFO: Building EXE from EXE-00.toc
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\__main__.py", line 321, in <module>
+    run()
+    ~~~^^
+  File "C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\__main__.py", line 215, in run
+    run_build(pyi_config, spec_file, **vars(args))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\__main__.py", line 70, in run_build
+    PyInstaller.building.build_main.main(pyi_config, spec_file, **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\building\build_main.py", line 1272, in main
+    build(specfile, distpath, workpath, clean_build)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\building\build_main.py", line 1210, in build
+    exec(code, spec_namespace)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Home\Desktop\ALL FILES\aviator betika sekentow\aviatorx\BetikaAviatorPlayerV3.spec", line 23, in <module>
+    exe = EXE(
+        pyz,
+    ...<17 lines>...
+        icon=['Assets\\betflow_icon.ico'],
+    )
+  File "C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\building\api.py", line 675, in __init__
+    self.__postinit__()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\building\datastruct.py", line 184, in __postinit__
+    self.assemble()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\Home\AppData\Roaming\Python\Python313\site-packages\PyInstaller\building\api.py", line 769, in assemble
+    os.remove(self.name)
+    ~~~~~~~~~^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Home\\Desktop\\ALL FILES\\aviator betika sekentow\\aviatorx\\dist\\BetikaAviatorPlayerV3.exe'

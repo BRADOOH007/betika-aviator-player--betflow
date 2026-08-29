@@ -10,8 +10,20 @@ import sys
 import subprocess
 import os
 
-# Force UTF-8 on std streams so Unicode (▶, —, emoji) doesn't crash the
-# Windows console when running from source. Windowed EXE has no stdout.
+# Force UTF-8 / safe std streams. A windowed (--noconsole) EXE has no
+# stdout/stderr, so redirect to a log file to avoid crashes on any print().
+def _open_log_stream():
+    try:
+        _p = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
+                          "betflow_runtime.log")
+        return open(_p, "a", encoding="utf-8", errors="replace")
+    except Exception:
+        return open(os.devnull, "w", encoding="utf-8", errors="replace")
+
+if sys.stdout is None:
+    sys.stdout = _open_log_stream()
+if sys.stderr is None:
+    sys.stderr = _open_log_stream()
 if hasattr(sys.stdout, "reconfigure"):
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -641,7 +653,7 @@ class BetFlowAviatorProGUI:
         except Exception:
             pass
         try:
-            self.root.after(5000, self._sched_tick)
+            self.root.after(3000, self._sched_tick)
         except Exception:
             pass
 
@@ -676,6 +688,12 @@ class BetFlowAviatorProGUI:
                 except Exception:
                     pass
                 eng._auto_enabled = bool(self.sched_auto_var.get())
+                # AUTO: start IMMEDIATELY once ready (password + phones present),
+                # instead of waiting for the 06:00-06:59 window. Manual reason so
+                # tick() will not kill the run at 07:00.
+                if (eng._auto_enabled and getattr(eng, '_password', None)
+                        and eng.pending_count() > 0 and not eng.is_running()):
+                    eng.start(eng._password, reason="manual")
             except Exception:
                 pass
             # reflect REAL-MONEY state clearly in the status line

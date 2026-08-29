@@ -37,8 +37,20 @@ import random
 import hashlib
 import json
 
-# Force UTF-8 on std streams so Unicode (▶, —, emoji) doesn't crash the
-# Windows console. In a windowed EXE stdout is None, so guard with hasattr.
+# Force UTF-8 / safe std streams. A windowed (--noconsole) EXE has no
+# stdout/stderr, so redirect to a log file to avoid crashes on any print().
+def _open_log_stream():
+    try:
+        _p = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
+                          "betflow_runtime.log")
+        return open(_p, "a", encoding="utf-8", errors="replace")
+    except Exception:
+        return open(os.devnull, "w", encoding="utf-8", errors="replace")
+
+if sys.stdout is None:
+    sys.stdout = _open_log_stream()
+if sys.stderr is None:
+    sys.stderr = _open_log_stream()
 if hasattr(sys.stdout, "reconfigure"):
     try:
         sys.stdout.reconfigure(encoding="utf-8")
