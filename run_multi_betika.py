@@ -36,6 +36,19 @@ import random
 import hashlib
 import json
 
+# Force UTF-8 on std streams so Unicode (▶, —, emoji) doesn't crash the
+# Windows console. In a windowed EXE stdout is None, so guard with hasattr.
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 from playwright.sync_api import sync_playwright
 
 import aviator_bot as ab

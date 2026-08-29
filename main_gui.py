@@ -10,6 +10,19 @@ import sys
 import subprocess
 import os
 
+# Force UTF-8 on std streams so Unicode (▶, —, emoji) doesn't crash the
+# Windows console when running from source. Windowed EXE has no stdout.
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 # Lite mode: only balance + Playwright Aviator; disable heavy modules
 LITE_MODE = True
 # Disable all keyboard shortcuts in GUI
