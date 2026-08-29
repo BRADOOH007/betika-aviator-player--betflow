@@ -16,11 +16,17 @@ Pillow>=10.0.0
 # System utilities
 psutil>=5.9.0
 
+# Accurate network time (NTP sync for scheduler)
+ntplib>=0.4.0
+
 # Encryption and security
 cryptography>=41.0.0
 
 # Optional: For enhanced discovery
 lxml>=4.9.0
+
+# Optional: Windows desktop notifications (run complete alert)
+win10toast>=0.9
 
 # Optional: For telegram integration (if needed)
 python-telegram-bot>=13.7

@@ -1,8 +1,8 @@
 # UTF-8
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(3, 2, 0, 0),
-    prodvers=(3, 2, 0, 0),
+    filevers=(3, 5, 0, 0),
+    prodvers=(3, 5, 0, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -15,14 +15,14 @@ VSVersionInfo(
       [
       StringTable(
         u'040904B0',
-        [StringStruct(u'CompanyName', u'BetFlow Pro'),
-        StringStruct(u'FileDescription', u'BetFlow Pro V4 - AI-Powered Betting Automation'),
-        StringStruct(u'FileVersion', u'3.2.0.0'),
-        StringStruct(u'InternalName', u'BetFlowPro'),
-        StringStruct(u'LegalCopyright', u'Copyright © 2025'),
-        StringStruct(u'OriginalFilename', u'BetFlowPro_V3.2.exe'),
-        StringStruct(u'ProductName', u'BetFlow Pro V3.2'),
-        StringStruct(u'ProductVersion', u'3.2.0.0')])
+        [StringStruct(u'CompanyName', u'BeTyca'),
+        StringStruct(u'FileDescription', u'BeTyca Aviator v3.5 - Multi-Account Scheduler'),
+        StringStruct(u'FileVersion', u'3.5.0.0'),
+        StringStruct(u'InternalName', u'BetikaAviatorPlayer'),
+        StringStruct(u'LegalCopyright', u'Copyright (C) 2026 BeTyca'),
+        StringStruct(u'OriginalFilename', u'BetikaAviatorPlayerV3.5.exe'),
+        StringStruct(u'ProductName', u'BeTyca Aviator Player'),
+        StringStruct(u'ProductVersion', u'3.5.0.0')])
       ]),
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]

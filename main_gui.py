@@ -43,6 +43,7 @@ DISABLE_SHORTCUTS = True
 from utils import encrypt_data, decrypt_data, log_message, set_persistence, should_persist
 from resource_path import resource_path, ensure_assets
 from aviator_backend import AviatorBackend
+import betika_balance as betika_balance_module
 
 # Stubs for removed modules
 BetFlowHeadless = None
@@ -64,18 +65,55 @@ except Exception:
 
 def allow_sleep(allow):
     """Prevent (or re-allow) Windows system sleep while the tool is open.
-    Keeps the machine awake so the 06:00 auto-start always fires."""
+    Uses ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED so the machine stays
+    awake even when the screen turns off, and a keep-alive thread fires
+    SetThreadExecutionState every 30 s to prevent Windows from overriding it."""
     try:
         import ctypes
-        ES_CONTINUOUS = 0x80000000
-        ES_AWAYMODE_REQUIRED = 0x00000040
+        ES_CONTINUOUS        = 0x80000000
+        ES_SYSTEM_REQUIRED   = 0x00000001   # prevent sleep
+        ES_DISPLAY_REQUIRED  = 0x00000002   # keep display if needed (optional)
+        ES_AWAYMODE_REQUIRED = 0x00000040   # allow screen off but keep CPU awake
         if allow:
             ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS)
         else:
             ctypes.windll.kernel32.SetThreadExecutionState(
-                ES_CONTINUOUS | ES_AWAYMODE_REQUIRED)
+                ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED)
     except Exception:
         pass
+
+
+# ── Wake-lock heartbeat ────────────────────────────────────────────────────
+# Windows can reset the execution state when threads switch; we re-assert it
+# every 30 seconds from a dedicated daemon thread to be safe.
+_wake_lock_active = False
+_wake_lock_thread = None
+
+def _wake_lock_heartbeat():
+    import ctypes
+    ES_CONTINUOUS        = 0x80000000
+    ES_SYSTEM_REQUIRED   = 0x00000001
+    ES_AWAYMODE_REQUIRED = 0x00000040
+    while _wake_lock_active:
+        try:
+            ctypes.windll.kernel32.SetThreadExecutionState(
+                ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED)
+        except Exception:
+            pass
+        time.sleep(30)
+
+def start_wake_lock():
+    global _wake_lock_active, _wake_lock_thread
+    _wake_lock_active = True
+    allow_sleep(False)
+    _wake_lock_thread = threading.Thread(target=_wake_lock_heartbeat,
+                                         daemon=True, name="wake-lock")
+    _wake_lock_thread.start()
+
+def stop_wake_lock():
+    global _wake_lock_active
+    _wake_lock_active = False
+    allow_sleep(True)
 
 
 def kill_stray_processes():
@@ -152,9 +190,9 @@ class BetFlowAviatorProGUI:
                 pass
 
         # Keep the machine awake so the 06:00 auto-start always fires while the tool is open.
-        allow_sleep(False)
+        start_wake_lock()
 
-        self.root.title(f"🎯 Aviator by BetFlow v{APP_VERSION} — AI-Powered Automation")
+        self.root.title(f"🎯 BeTyca Aviator v{APP_VERSION} — AI-Powered Automation")
         
         # Get screen dimensions for centering
         screen_width = self.root.winfo_screenwidth()
@@ -399,6 +437,7 @@ class BetFlowAviatorProGUI:
         self.preloader_started = False
         self.last_accounts_text = ""
         self.last_password = ""
+        self._checked_balances = {}
         
         # Network callback is set after engine init
 
@@ -461,6 +500,41 @@ class BetFlowAviatorProGUI:
         self.create_widgets()
         update_splash_progress(90, "✅ UI components ready")
         
+        # ── Restore saved credentials and phone list ──────────────────────────
+        try:
+            saved_phones = self.config.get('aviator_phone_list', '').strip()
+            if saved_phones:
+                self.phone_text.delete('1.0', tk.END)
+                self.phone_text.insert('1.0', saved_phones + '\n')
+        except Exception:
+            pass
+        try:
+            import base64
+            saved_pass = self.config.get('aviator_pass', '')
+            if saved_pass:
+                decoded = base64.b64decode(saved_pass.encode()).decode()
+                self.password_entry.delete(0, tk.END)
+                self.password_entry.insert(0, decoded)
+        except Exception:
+            pass
+        try:
+            if self.config.get('aviator_site'):
+                self.site_var.set(self.config['aviator_site'])
+        except Exception:
+            pass
+        try:
+            self.sched_workers_var.set(str(self.config.get('sched_workers', 4)))
+            self.sched_rounds_var.set(str(self.config.get('sched_rounds', 50)))
+            self.sched_stake_var.set(str(self.config.get('sched_stake', 10)))
+            self.sched_auto_var.set(bool(self.config.get('sched_auto', True)))
+            self.sched_real_var.set(bool(self.config.get('sched_real', True)))
+            self.sched_cashout_var.set(str(self.config.get('sched_cashout', 1.01)))
+            self.sched_minimize_var.set(bool(self.config.get('sched_minimize', True)))
+            self.sched_stagger_min_var.set(str(self.config.get('sched_stagger_min', 5)))
+            self.sched_stagger_max_var.set(str(self.config.get('sched_stagger_max', 20)))
+        except Exception:
+            pass
+
         # Setup keyboard shortcuts
         self.setup_keyboard_shortcuts()
         
@@ -547,13 +621,24 @@ class BetFlowAviatorProGUI:
             minimize = bool(self.sched_minimize_var.get())
         except Exception:
             minimize = True
+        try:
+            stagger_min = max(0, int(self.sched_stagger_min_var.get() or 5))
+            stagger_max = max(stagger_min, int(self.sched_stagger_max_var.get() or 20))
+        except Exception:
+            stagger_min, stagger_max = 5, 20
         self._engine = se.SchedulerEngine(
             worker_count=worker_count, rounds=rounds, stake=stake,
             real_money=real_money, cashout=cashout,
             minimize=minimize,
+            stagger_min=stagger_min,
+            stagger_max=stagger_max,
             progress_cb=self._sched_log,
         )
-        self.root.after(5000, self._sched_tick)
+        # Always start fresh — wipe any state left from a previous session.
+        # The phone list in the GUI is the single source of truth; old state
+        # from yesterday / a previous run must never bleed into a new session.
+        self._engine.reset_state_file()
+        self.root.after(10000, self._sched_tick)
         self.root.after(1000, self._update_countdown)
         self._update_sched_status()
 
@@ -587,7 +672,7 @@ class BetFlowAviatorProGUI:
 
     def _sched_log(self, msg):
         try:
-            self.log(f"[SCHED] {msg}")
+            self.log(msg)
         except Exception:
             pass
 
@@ -653,7 +738,7 @@ class BetFlowAviatorProGUI:
         except Exception:
             pass
         try:
-            self.root.after(3000, self._sched_tick)
+            self.root.after(10000, self._sched_tick)
         except Exception:
             pass
 
@@ -678,9 +763,7 @@ class BetFlowAviatorProGUI:
                     eng.minimize = bool(self.sched_minimize_var.get())
                 except Exception:
                     eng.minimize = True
-                # Cache the login password so AUTO/tick() can start workers at
-                # 06:00 without a prior manual Run. Only overwrite when non-empty
-                # so a valid cached password is never clobbered by a blank field.
+                # Cache password so precision timer can fire at 06:00 unattended.
                 try:
                     _pw = self.password_entry.get().strip()
                     if _pw:
@@ -688,15 +771,16 @@ class BetFlowAviatorProGUI:
                 except Exception:
                     pass
                 eng._auto_enabled = bool(self.sched_auto_var.get())
-                # AUTO: start IMMEDIATELY once ready (password + phones present),
-                # instead of waiting for the 06:00-06:59 window. Manual reason so
-                # tick() will not kill the run at 07:00.
-                if (eng._auto_enabled and getattr(eng, '_password', None)
-                        and eng.pending_count() > 0 and not eng.is_running()):
-                    eng.start(eng._password, reason="manual")
+                try:
+                    eng.stagger_min = max(0, int(self.sched_stagger_min_var.get() or 5))
+                    eng.stagger_max = max(eng.stagger_min,
+                                          int(self.sched_stagger_max_var.get() or 20))
+                except Exception:
+                    pass
+                # Auto-start is handled exclusively by the precision timer at 06:00 EAT.
             except Exception:
                 pass
-            # reflect REAL-MONEY state clearly in the status line
+            # Status line: mode + engine status (includes skipped count)
             rm = "REAL-MONEY" if getattr(eng, 'real_money', False) else "SIM"
             base = eng.status_text()
             self.sched_status_label.config(text=f"[{rm}] {base}")
@@ -731,14 +815,16 @@ class BetFlowAviatorProGUI:
                 self.log("[SCHED] Scheduler not available.")
                 return
             eng = self._engine
+            # Sync engine to EXACTLY what is in the phone field right now.
+            # This removes any stale numbers and adds new ones.
             eng.set_phones(phones)
             total, pending = eng.total_count(), eng.pending_count()
-            mode = "⚠ REAL-MONEY (real wagers!)" if eng.real_money else "SIMULATION (no real bets)"
-            self.log(f"[SCHED] Manual run: {pending}/{total} pending with "
-                     f"{eng.worker_count} worker(s) | rounds/acct={eng.rounds} "
-                     f"stake={eng.stake}KES cashout=1.01x | mode: {mode}")
+            mode = "⚠ REAL-MONEY" if eng.real_money else "SIMULATION"
+            self.log(f"[SCHED] Run: {pending}/{total} pending | "
+                     f"{eng.worker_count} worker(s) | "
+                     f"rounds={eng.rounds} stake={eng.stake}KES | {mode}")
             if pending == 0:
-                self.log("[SCHED] All accounts already done. Use Reset to restart.")
+                self.log("[SCHED] All accounts already done this session. Press Reset to re-run.")
                 return
             eng.start(password, workers=eng.worker_count, reason="manual")
         except Exception as e:
@@ -751,7 +837,19 @@ class BetFlowAviatorProGUI:
         try:
             if getattr(self, '_engine', None) is not None:
                 self._engine.stop(reason="user")
-            self.log("[SCHED] Stopping all workers (in-progress accounts retried next run).")
+                # Signal the precision timer to abort any in-progress sleep
+                try:
+                    self._engine._stop_timer_evt.set()
+                except Exception:
+                    pass
+                # Kill any lingering worker threads
+                try:
+                    self._engine._stop_evt.set()
+                    self._engine._running = False
+                    self._engine._active_workers = 0
+                except Exception:
+                    pass
+            self.log("⛔ Stopped — all workers halted.")
         except Exception as e:
             try:
                 self.log(f"[SCHED] Stop error: {e}")
@@ -795,7 +893,7 @@ class BetFlowAviatorProGUI:
         try:
             if getattr(self, '_engine', None) is not None:
                 self._engine.mark_all_pending()
-            self.log("[SCHED] Progress reset — all accounts marked pending.")
+            self.log("🔄 Reset — all accounts marked pending for next run.")
             self._update_sched_status()
         except Exception as e:
             try:
@@ -827,7 +925,7 @@ class BetFlowAviatorProGUI:
         import threading
 
         # Re-allow the OS to sleep now that the tool is closing.
-        allow_sleep(True)
+        stop_wake_lock()
         # ⚡ IMMEDIATE: Set kill switch first (prevents new operations)
         # 🏊 Close browser pool gracefully
         try:
@@ -1065,6 +1163,12 @@ class BetFlowAviatorProGUI:
                         config['sched_minimize'] = bool(self.sched_minimize_var.get())
                     except Exception:
                         config['sched_minimize'] = True
+                    try:
+                        config['sched_stagger_min'] = int(self.sched_stagger_min_var.get())
+                        config['sched_stagger_max'] = int(self.sched_stagger_max_var.get())
+                    except Exception:
+                        config['sched_stagger_min'] = 5
+                        config['sched_stagger_max'] = 20
                 except Exception:
                     pass
                 try:
@@ -1099,6 +1203,138 @@ class BetFlowAviatorProGUI:
         except Exception as e:
             self.log(f"Error: {e}")
 
+    def check_balances_action(self):
+        """💰 Check Balance (API) — for every account in the list: log in via the
+        Betika REST API, read the live balance from the login response, drop the
+        session (logout), and move to the next account.
+
+        The terminal shows ONLY the number and the balance (no login/HTTP noise).
+        After the check, the daily 06:00 auto-start is armed so the Aviator game
+        begins on its own when "six" (06:00 EAT) arrives.
+        """
+        phones = [p.strip() for p in self.phone_text.get('1.0', tk.END).splitlines() if p.strip()]
+        password = self.password_entry.get().strip()
+        if not phones:
+            self.log("❌ Enter phone numbers first (one per line).")
+            return
+        if not password:
+            self.log("❌ Enter the account password first.")
+            return
+
+        self._balance_btn.config(state='disabled', text='⏳ Checking…')
+        self.log("💰 BALANCE CHECK (API) — login → balance → logout, per account")
+
+        def run():
+            ok = fail = 0
+            results = {}
+            total_balance = 0.0
+            total_bonus = 0.0
+            for ph in phones:
+                res = betika_balance_module.check_account(ph, password)
+                if res['ok']:
+                    bal = res['balance']
+                    bonus = res.get('bonus') or 0.0
+                    results[ph] = bal
+                    label = res['normalized'] or ph
+                    self.log(f"{label}: KES {bal:,.2f}, Bonus: KES {bonus:,.2f}")
+                    total_balance += bal
+                    total_bonus += bonus
+                    ok += 1
+                else:
+                    results[ph] = None
+                    self.log(f"{ph}: ⚠ {res['error']}")
+                    fail += 1
+            self._checked_balances = {k: v for k, v in results.items() if v is not None}
+            self.log("─" * 48)
+            self.log(f"✔ Checked {len(phones)} | {ok} with funds | {fail} failed")
+            self.log(f"💰 TOTAL BALANCE: KES {total_balance:,.2f}")
+            self.log(f"🎁 TOTAL BONUS:   KES {total_bonus:,.2f}")
+            self._arm_six_auto_start(password, phones)
+            self.root.after(0, lambda: self._balance_btn.config(
+                state='normal', text='💰 Check Balance'))
+
+        threading.Thread(target=run, daemon=True).start()
+
+    def withdraw_action(self):
+        """💸 Withdraw (API) — for every account in the list, log in, request a
+        withdrawal of the entered KES amount to that account's registered MPESA
+        number, then move to the next account. Requires explicit confirmation
+        because it moves REAL money. Shows only number + result per account, plus
+        a total-withdrawn summary at the end.
+        """
+        phones = [p.strip() for p in self.phone_text.get('1.0', tk.END).splitlines() if p.strip()]
+        password = self.password_entry.get().strip()
+        amt_raw = self.amount_entry.get().strip()
+        if not phones:
+            messagebox.showerror("No Numbers", "Enter phone numbers first (one per line).")
+            return
+        if not password:
+            messagebox.showerror("No Password", "Enter the account password first.")
+            return
+        if not amt_raw:
+            messagebox.showerror("No Amount", "Enter the amount to withdraw (KES).")
+            return
+        try:
+            amount = float(amt_raw)
+        except ValueError:
+            messagebox.showerror("Invalid Amount", "Amount must be a number (e.g. 100 or 250.50).")
+            return
+        if amount <= 0:
+            messagebox.showerror("Invalid Amount", "Amount must be greater than 0.")
+            return
+        confirm = messagebox.askyesno(
+            "Confirm Withdrawal",
+            f"Withdraw KES {amount:,.2f} from {len(phones)} account(s) to their "
+            f"registered MPESA numbers.\n\nThis moves REAL money and cannot be undone.\nProceed?",
+            icon='warning')
+        if not confirm:
+            self.log("Withdrawal cancelled.")
+            return
+
+        self._withdraw_btn.config(state='disabled', text='⏳ Withdrawing…')
+        self.log(f"💸 WITHDRAW (API) — KES {amount:,.2f} per account → registered MPESA")
+
+        def run():
+            ok = fail = 0
+            total_withdrawn = 0.0
+            for ph in phones:
+                res = betika_balance_module.withdraw_account(ph, password, amount)
+                label = res['normalized'] or ph
+                if res['ok']:
+                    self.log(f"{label}: withdrew KES {amount:,.2f} — {res.get('message', 'done')}")
+                    total_withdrawn += amount
+                    ok += 1
+                else:
+                    self.log(f"{label}: ⚠ {res['error']}")
+                    fail += 1
+            self.log("─" * 48)
+            self.log(f"✔ Withdraw attempted on {len(phones)} | {ok} sent | {fail} failed")
+            self.log(f"💸 TOTAL WITHDRAWN: KES {total_withdrawn:,.2f}")
+            self.root.after(0, lambda: self._withdraw_btn.config(
+                state='normal', text='💸 Withdraw'))
+
+        threading.Thread(target=run, daemon=True).start()
+
+    def _arm_six_auto_start(self, password, phones):
+        """After a balance check, arm the daily 06:00 EAT auto-start so the
+        Aviator game launches on its own at 'six'. We set the engine's auto flag
+        directly (NOT via _update_sched_status, which would start immediately)."""
+        try:
+            if getattr(self, '_engine', None) is None:
+                self._init_scheduler()
+            eng = self._engine
+            if eng is None:
+                return
+            eng.set_phones(phones)
+            eng._password = password
+            eng._auto_enabled = True
+            self.log("🔓 Auto-start ARMED — Aviator game begins on its own at 06:00 EAT.")
+        except Exception as e:
+            try:
+                self.log(f"[arm] {e}")
+            except Exception:
+                pass
+
     def create_widgets(self):
         BG      = self.colors['bg']
         FG      = self.colors['fg']
@@ -1123,7 +1359,7 @@ class BetFlowAviatorProGUI:
             except Exception:
                 pass
 
-        tk.Label(header, text="BetFlow Aviator", font=('Arial', 15, 'bold'),
+        tk.Label(header, text="BeTyca Aviator", font=('Arial', 15, 'bold'),
                  fg='#00E676', bg='#111111').pack(side='left', pady=8)
         tk.Label(header, text="Multi-Account Scheduler", font=('Arial', 10),
                  fg='#666666', bg='#111111').pack(side='left', padx=6, pady=8)
@@ -1145,7 +1381,7 @@ class BetFlowAviatorProGUI:
         body.pack(fill='both', expand=True, padx=0, pady=0)
 
         # Left control panel (fixed width)
-        left = tk.Frame(body, bg=BG, width=300)
+        left = tk.Frame(body, bg=BG, width=340)
         left.pack(side='left', fill='y', padx=(10, 4), pady=10)
         left.pack_propagate(False)
 
@@ -1182,56 +1418,80 @@ class BetFlowAviatorProGUI:
                                         command=self._toggle_password_visibility)
         self._pw_toggle_btn.grid(row=1, column=2, padx=(0, 8), pady=6, sticky='e')
 
+        # ── Phone list label + text area (rows 2–3) ──────────────────────────
         # Phone list (paste as many numbers as you like, one per line) — the
         # primary account input for the auto-scheduler.
-        tk.Label(creds_frame, text="Phone numbers\n(paste list, 1 per line)",
-                 fg=FG, bg=BG, font=('Arial', 8)).grid(
-            row=2, column=0, padx=8, pady=(4, 0), sticky='nw')
+        tk.Label(creds_frame, text="Phone numbers  (paste list, 1 per line)",
+                 fg=FG, bg=BG, font=('Arial', 9)).grid(
+            row=2, column=0, columnspan=3, padx=8, pady=(6, 2), sticky='w')
         self.phone_text = scrolledtext.ScrolledText(
-            creds_frame, width=30, height=9, bg=TBG, fg=TFG,
+            creds_frame, width=30, height=7, bg=TBG, fg=TFG,
             insertbackground=TFG, relief='flat', bd=3, font=('Consolas', 10),
             padx=6, pady=4)
-        self.phone_text.grid(row=2, column=1, padx=8, pady=(4, 0), sticky='ew')
+        self.phone_text.grid(row=3, column=0, columnspan=3, padx=8, pady=(0, 4), sticky='ew')
 
         # Load phone list from a file (one number per line / comma/space separated)
         load_row = tk.Frame(creds_frame, bg=BG)
-        load_row.grid(row=3, column=1, padx=8, pady=(4, 0), sticky='ew')
+        load_row.grid(row=4, column=0, columnspan=3, padx=8, pady=(0, 4), sticky='ew')
         tk.Button(load_row, text="📂 Load from file…", command=self._load_phones_file,
                   bg='#1565C0', fg='white', font=('Arial', 10, 'bold'),
                   relief='flat', cursor='hand2', bd=0, height=1,
                   activebackground='#1976D2').pack(fill='x')
 
+        # ── Check Balance button (row 5) ──────────────────────────────────────
+        self._balance_btn = tk.Button(
+            creds_frame, text="💰  Check Balance", command=self.check_balances_action,
+            bg='#FFB300', fg='#000000', font=('Arial', 10, 'bold'),
+            relief='flat', cursor='hand2', bd=0, height=1,
+            activebackground='#FFD54F', activeforeground='#000000')
+        self._balance_btn.grid(row=5, column=0, columnspan=3,
+                               padx=8, pady=(2, 4), sticky='ew')
+
+        # ── Withdraw row (row 6) ──────────────────────────────────────────────
+        withdraw_row = tk.Frame(creds_frame, bg=BG)
+        withdraw_row.grid(row=6, column=0, columnspan=3, padx=8, pady=(0, 8), sticky='ew')
+        withdraw_row.columnconfigure(1, weight=1)
+        tk.Label(withdraw_row, text="Withdraw KES:", fg=FG, bg=BG,
+                 font=('Arial', 10)).grid(row=0, column=0, sticky='w', padx=(0, 6))
+        self.amount_entry = tk.Entry(withdraw_row, bg=TBG, fg=TFG, font=('Arial', 10),
+                                     insertbackground=TFG, relief='flat', bd=4)
+        self.amount_entry.grid(row=0, column=1, sticky='ew', padx=(0, 6))
+        self._withdraw_btn = tk.Button(
+            withdraw_row, text="💸 Withdraw", command=self.withdraw_action,
+            bg='#E53935', fg='#fff', font=('Arial', 10, 'bold'),
+            relief='flat', cursor='hand2', bd=0, height=1, padx=10,
+            activebackground='#EF5350', activeforeground='#fff')
+        self._withdraw_btn.grid(row=0, column=2, sticky='ew')
+
         self.password_entry.bind('<FocusOut>', lambda e: self.save_config())
-
-
 
         # ── Auto Scheduler (daily 06:00-06:59, parallel workers) ─────────────
         sched_frame = tk.LabelFrame(left, text=" Auto Scheduler (06:00–06:59) ",
                                     fg='#888', bg=BG, font=('Arial', 9),
                                     bd=1, relief='solid')
-        sched_frame.pack(fill='x', pady=(0, 8))
+        sched_frame.pack(fill='x', pady=(0, 4))
         sched_frame.columnconfigure(1, weight=1)
 
         tk.Label(sched_frame, text="Workers", fg=FG, bg=BG,
-                 font=('Arial', 9)).grid(row=0, column=0, padx=8, pady=4, sticky='w')
+                 font=('Arial', 9)).grid(row=0, column=0, padx=8, pady=2, sticky='w')
         self.sched_workers_var = tk.StringVar(value="4")
         tk.Entry(sched_frame, textvariable=self.sched_workers_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
-                 relief='flat', bd=4, width=6).grid(row=0, column=1, padx=8, pady=4, sticky='w')
+                 relief='flat', bd=4, width=6).grid(row=0, column=1, padx=8, pady=2, sticky='w')
 
         tk.Label(sched_frame, text="Rounds/acct", fg=FG, bg=BG,
-                 font=('Arial', 9)).grid(row=1, column=0, padx=8, pady=4, sticky='w')
+                 font=('Arial', 9)).grid(row=1, column=0, padx=8, pady=2, sticky='w')
         self.sched_rounds_var = tk.StringVar(value="50")
         tk.Entry(sched_frame, textvariable=self.sched_rounds_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
-                 relief='flat', bd=4, width=6).grid(row=1, column=1, padx=8, pady=4, sticky='w')
+                 relief='flat', bd=4, width=6).grid(row=1, column=1, padx=8, pady=2, sticky='w')
 
         tk.Label(sched_frame, text="Stake KES", fg=FG, bg=BG,
-                 font=('Arial', 9)).grid(row=2, column=0, padx=8, pady=4, sticky='w')
+                 font=('Arial', 9)).grid(row=2, column=0, padx=8, pady=2, sticky='w')
         self.sched_stake_var = tk.StringVar(value="10")
         tk.Entry(sched_frame, textvariable=self.sched_stake_var, bg=TBG,
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
-                 relief='flat', bd=4, width=6).grid(row=2, column=1, padx=8, pady=4, sticky='w')
+                 relief='flat', bd=4, width=6).grid(row=2, column=1, padx=8, pady=2, sticky='w')
 
         self.sched_auto_var = tk.BooleanVar(value=True)
         tk.Checkbutton(sched_frame, text="Auto-start daily (06:00)",
@@ -1265,14 +1525,32 @@ class BetFlowAviatorProGUI:
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=7, column=1, padx=8, pady=2, sticky='w')
 
+        # Stagger delay between worker starts (anti-detection)
+        stagger_row = tk.Frame(sched_frame, bg=BG)
+        stagger_row.grid(row=6, column=0, columnspan=2, padx=8, pady=2, sticky='ew')
+        tk.Label(stagger_row, text="Stagger (s)", fg=FG, bg=BG,
+                 font=('Arial', 9)).pack(side='left')
+        self.sched_stagger_min_var = tk.StringVar(value="5")
+        tk.Entry(stagger_row, textvariable=self.sched_stagger_min_var, bg=TBG,
+                 fg=TFG, font=('Arial', 10), insertbackground=TFG,
+                 relief='flat', bd=4, width=4).pack(side='left', padx=(6, 2))
+        tk.Label(stagger_row, text="–", fg='#888', bg=BG,
+                 font=('Arial', 9)).pack(side='left')
+        self.sched_stagger_max_var = tk.StringVar(value="20")
+        tk.Entry(stagger_row, textvariable=self.sched_stagger_max_var, bg=TBG,
+                 fg=TFG, font=('Arial', 10), insertbackground=TFG,
+                 relief='flat', bd=4, width=4).pack(side='left', padx=(2, 0))
+        tk.Label(stagger_row, text="  between workers", fg='#555', bg=BG,
+                 font=('Arial', 8)).pack(side='left', padx=4)
+
         self.sched_status_label = tk.Label(
             sched_frame, text="Scheduler idle", fg='#888', bg=BG,
-            font=('Consolas', 8), wraplength=270, justify='left')
+            font=('Consolas', 8), wraplength=310, justify='left')
         self.sched_status_label.grid(row=8, column=0, columnspan=2, padx=8, pady=4, sticky='ew')
 
         self.sched_countdown_label = tk.Label(
             sched_frame, text="AUTO scheduler OFF", fg='#888', bg=BG,
-            font=('Consolas', 9, 'bold'), wraplength=270, justify='left')
+            font=('Consolas', 9, 'bold'), wraplength=310, justify='left')
         self.sched_countdown_label.grid(row=9, column=0, columnspan=2, padx=8, pady=(0, 4), sticky='ew')
 
         btnrow = tk.Frame(sched_frame, bg=BG)
@@ -1283,22 +1561,22 @@ class BetFlowAviatorProGUI:
 
         run_now_btn = tk.Button(btnrow, text="▶ Run Now",
                                 command=self._sched_run_now, bg='#00C853',
-                                fg='#000', font=('Arial', 11, 'bold'),
+                                fg='#000', font=('Arial', 10, 'bold'),
                                 relief='flat', cursor='hand2', bd=0,
-                                height=2, activebackground='#00E676')
+                                height=1, activebackground='#00E676')
         run_now_btn.grid(row=0, column=0, padx=2, sticky='ew')
 
         stop_btn = tk.Button(btnrow, text="■ Stop",
                              command=self._sched_stop, bg='#D32F2F', fg='white',
-                             font=('Arial', 11, 'bold'), relief='flat',
-                             cursor='hand2', bd=0, height=2,
+                             font=('Arial', 10, 'bold'), relief='flat',
+                             cursor='hand2', bd=0, height=1,
                              activebackground='#EF5350')
         stop_btn.grid(row=0, column=1, padx=2, sticky='ew')
 
         reset_btn = tk.Button(btnrow, text="↺ Reset",
                               command=self._sched_reset, bg='#1565C0', fg='white',
-                              font=('Arial', 11, 'bold'), relief='flat',
-                              cursor='hand2', bd=0, height=2,
+                              font=('Arial', 10, 'bold'), relief='flat',
+                              cursor='hand2', bd=0, height=1,
                               activebackground='#1976D2')
         reset_btn.grid(row=0, column=2, padx=2, sticky='ew')
 
@@ -1310,18 +1588,18 @@ class BetFlowAviatorProGUI:
 
 
         stats = tk.Frame(left, bg=BG)
-        stats.pack(fill='x', pady=(0, 8))
+        stats.pack(fill='x', pady=(0, 4))
         stats.columnconfigure(0, weight=1)
         stats.columnconfigure(1, weight=1)
 
         def _card(parent, row, col, label):
             f = tk.Frame(parent, bg='#1a1a2e', bd=0)
-            f.grid(row=row, column=col, padx=3, pady=3, sticky='ew')
+            f.grid(row=row, column=col, padx=3, pady=2, sticky='ew')
             tk.Label(f, text=label, fg='#555', bg='#1a1a2e',
-                     font=('Arial', 8)).pack(pady=(6,0))
+                     font=('Arial', 7)).pack(pady=(4,0))
             val = tk.Label(f, text="—", fg='#FFB300', bg='#1a1a2e',
-                           font=('Consolas', 11, 'bold'))
-            val.pack(pady=(0,6))
+                           font=('Consolas', 10, 'bold'))
+            val.pack(pady=(0,4))
             return val
 
         self.step_label   = _card(stats, 0, 0, "STEP")
@@ -1332,29 +1610,29 @@ class BetFlowAviatorProGUI:
 
         # ── Control buttons (primary = multi-account scheduler) ──────────────
         self.martingale_btn = tk.Button(
-            left, text="▶   RUN SCHEDULER",
+            left, text="▶   RUN NOW",
             command=self._primary_click,
-            bg='#00C853', fg='#000', font=('Arial', 14, 'bold'),
-            relief='flat', cursor='hand2', height=3, bd=0,
+            bg='#00C853', fg='#000', font=('Arial', 13, 'bold'),
+            relief='flat', cursor='hand2', height=2, bd=0,
             activebackground='#00E676', activeforeground='#000'
         )
-        self.martingale_btn.pack(fill='x', pady=(0, 6))
+        self.martingale_btn.pack(fill='x', pady=(0, 4))
 
         self.stop_btn = tk.Button(
             left, text="■   STOP",
             command=self._primary_stop,
-            bg='#D32F2F', fg='white', font=('Arial', 14, 'bold'),
-            relief='flat', cursor='hand2', height=3, bd=0,
+            bg='#D32F2F', fg='white', font=('Arial', 13, 'bold'),
+            relief='flat', cursor='hand2', height=2, bd=0,
             activebackground='#EF5350', activeforeground='white',
             state='disabled'
         )
-        self.stop_btn.pack(fill='x', pady=(0, 6))
+        self.stop_btn.pack(fill='x', pady=(0, 4))
 
         self.csv_btn = tk.Button(
             left, text="📁  Export CSV",
             command=self.export_martingale_csv,
-            bg='#1565C0', fg='white', font=('Arial', 11, 'bold'),
-            relief='flat', cursor='hand2', height=2, bd=0,
+            bg='#1565C0', fg='white', font=('Arial', 10, 'bold'),
+            relief='flat', cursor='hand2', height=1, bd=0,
             activebackground='#1976D2', activeforeground='white'
         )
         self.csv_btn.pack(fill='x')
@@ -1602,32 +1880,46 @@ class BetFlowAviatorProGUI:
         # Start watchdog
         self.root.after(int(self._watchdog_interval * 1000), watchdog_check)
     
+    # ── Noise patterns to suppress from terminal ──────────────────────────
+    _SUPPRESS_PATTERNS = [
+        # Preloader / system chatter
+        "preloading system", "system ready", "smart mode", "preload",
+        "network check", "network monitor", "checking network",
+        "gui watchdog", "watchdog", "heartbeat",
+        "stability", "stray process", "no stray",
+        "configuration loaded", "security layer", "initializing",
+        "applying theme", "theme applied",
+        # Scheduler internal noise
+        "[time] synced", "[time] warning",
+        "[timer] next auto-start",           # shown in countdown label, not terminal
+        "scheduler idle",
+        # Generic debug
+        "debug:", "verbose:", "[debug]",
+        # Phone number count spam
+        "phone numbers loaded:", "phone numbers uploaded:",
+    ]
+
+    def _should_suppress(self, message: str) -> bool:
+        """Return True if this message is too noisy for the terminal."""
+        low = message.lower()
+        return any(pat in low for pat in self._SUPPRESS_PATTERNS)
+
     def log(self, message):
-        """Thread-safe log method with batching to prevent GUI glitches"""
+        """Thread-safe log method with noise filtering and batching."""
+        if self._should_suppress(message):
+            return
         # Add message to buffer
         with self._gui_update_lock:
             self._log_buffer.append(message)
-            
-            # Adaptive scheduling: faster updates in fast mode
             max_batch = self._log_buffer_max_fast if self._fast_mode_active else self._log_buffer_max
-            
-            # Schedule batch update if not already scheduled or if buffer is full
             should_schedule = not self._log_update_scheduled or len(self._log_buffer) >= max_batch
-            
             if should_schedule:
                 self._log_update_scheduled = True
-                
                 def _schedule_batch_update():
-                    """Schedule batch update on main thread"""
                     self._batch_log_updates()
-                
-                # Schedule on main thread with throttling
-                # In fast mode, use shorter delay for more responsive updates
-                delay = 0 if self._fast_mode_active else 0
                 if threading.current_thread() != threading.main_thread():
-                    self.root.after(delay, _schedule_batch_update)
+                    self.root.after(0, _schedule_batch_update)
                 else:
-                    # On main thread, use after_idle to batch with other updates
                     self.root.after_idle(_schedule_batch_update)
     
     def update_button_states(self, event=None):
@@ -1635,15 +1927,8 @@ class BetFlowAviatorProGUI:
         # If place_bets_btn is not present (Aviator-only UI), skip
         if not hasattr(self, 'place_bets_btn'):
             return
-        if phones_text:
-            phone_list = [line.strip() for line in phones_text.split('\n') if line.strip()]
-            count = len(phone_list)
-            self.log(f"Phone numbers loaded: {count} numbers")
-            # Keep button always green and enabled - will show error if no phones
-            self.place_bets_btn.config(state='normal', bg='#4CAF50')
-        else:
-            # Keep button green even with no phones - validation will happen on click
-            self.place_bets_btn.config(state='normal', bg='#4CAF50')
+        # Keep button always enabled — validation happens on click
+        self.place_bets_btn.config(state='normal', bg='#4CAF50')
     
     def on_text_changed(self, event=None):
         """🚀 SMART PRELOAD: Called when user types/pastes - start background processing"""
@@ -3208,7 +3493,7 @@ class BetFlowAviatorProGUI:
         footer_frame = tk.Frame(hub_window, bg='#2d2d2d', pady=5)
         footer_frame.pack(fill='x', side='bottom')
         
-        tk.Label(footer_frame, text="✈️ BetFlow Aviator Pro v1.0.0 - Aviator Automation", 
+        tk.Label(footer_frame, text="✈️ BeTyca Aviator v1.0.0 - Aviator Automation", 
                 fg='#888888', bg='#2d2d2d', font=('Arial', 8)).pack(side='left', padx=10)
         
         tk.Button(footer_frame, text="✕ Close AI HUB", command=on_close, 

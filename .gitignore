@@ -1,11 +1,53 @@
-﻿# Build artifacts
+﻿# ── Build artifacts ───────────────────────────────────────────────────────────
 build/
+dist/
+*.spec
 build.log
 build.pid
 build.err
 gui_test.err
-*.spec
+gui_err.txt
+gui_out.txt
 __pycache__/
 *.pyc
-# Runtime log (windowed EXE)
+*.pyo
+*.pyd
+
+# ── Runtime logs ──────────────────────────────────────────────────────────────
 betflow_runtime.log
+logs/
+
+# ── Config (contains credentials — never commit) ─────────────────────────────
+config/endpoints.json
+config/encryption.key
+config/scheduler_state.json
+config/account_health.json
+config/engine.json
+config/scheduler_state.json
+
+# ── Run results / CSV exports ─────────────────────────────────────────────────
+results/
+
+# ── Probe / debug one-off files ───────────────────────────────────────────────
+_net.json
+_probe_out.txt
+_show_login.py
+dom_probe.json
+probe3_autotab_panel.json
+diagnose_login_button.py
+dump_dom.py
+dryrun_betika.py
+probe2.py
+probe3.py
+probe4.py
+probe_rounds.py
+test_login.py
+test_login_click.py
+
+# ── Phone number files (private data) ────────────────────────────────────────
+phones_one.txt
+phones_sample.txt
+
+# ── Discovered endpoints (runtime generated) ─────────────────────────────────
+config/discovered_endpoints.json
+config/endpoint_scores.json
