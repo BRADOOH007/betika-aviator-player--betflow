@@ -1215,7 +1215,7 @@ class BetFlowAviatorProGUI:
                  fg=TFG, font=('Arial', 10), insertbackground=TFG,
                  relief='flat', bd=4, width=6).grid(row=2, column=1, padx=8, pady=4, sticky='w')
 
-        self.sched_auto_var = tk.BooleanVar(value=False)
+        self.sched_auto_var = tk.BooleanVar(value=True)
         tk.Checkbutton(sched_frame, text="Auto-start daily (06:00)",
                        variable=self.sched_auto_var, fg=FG, bg=BG,
                        selectcolor='#333', activebackground=BG,
@@ -1223,7 +1223,7 @@ class BetFlowAviatorProGUI:
                        ).grid(row=3, column=0, columnspan=2, padx=8, pady=2, sticky='w')
 
         # ── REAL-MONEY toggle (off by default = safe UI-flow simulation) ──
-        self.sched_real_var = tk.BooleanVar(value=False)
+        self.sched_real_var = tk.BooleanVar(value=True)
         tk.Checkbutton(
             sched_frame, text="⚠ REAL-MONEY betting",
             variable=self.sched_real_var, fg='#FFB300', bg=BG,

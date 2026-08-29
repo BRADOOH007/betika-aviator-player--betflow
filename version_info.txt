@@ -1,8 +1,8 @@
 # UTF-8
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(4, 0, 0, 0),
-    prodvers=(4, 0, 0, 0),
+    filevers=(3, 1, 0, 0),
+    prodvers=(3, 1, 0, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -17,12 +17,12 @@ VSVersionInfo(
         u'040904B0',
         [StringStruct(u'CompanyName', u'BetFlow Pro'),
         StringStruct(u'FileDescription', u'BetFlow Pro V4 - AI-Powered Betting Automation'),
-        StringStruct(u'FileVersion', u'4.0.0.0'),
+        StringStruct(u'FileVersion', u'3.1.0.0'),
         StringStruct(u'InternalName', u'BetFlowPro'),
         StringStruct(u'LegalCopyright', u'Copyright © 2025'),
-        StringStruct(u'OriginalFilename', u'BetFlowPro_V4.exe'),
-        StringStruct(u'ProductName', u'BetFlow Pro V4'),
-        StringStruct(u'ProductVersion', u'4.0.0.0')])
+        StringStruct(u'OriginalFilename', u'BetFlowPro_V3.1.exe'),
+        StringStruct(u'ProductName', u'BetFlow Pro V3.1'),
+        StringStruct(u'ProductVersion', u'3.1.0.0')])
       ]),
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]

@@ -9,7 +9,7 @@ import json
 import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Optional
-import numpy as np
+
 
 
 class StealthEngine:
@@ -109,7 +109,7 @@ class StealthEngine:
         min_delay, max_delay = base_delays.get(action_type, base_delays["general"])
         
         # Use beta distribution for more realistic human timing (skewed towards faster)
-        delay = np.random.beta(2, 5) * (max_delay - min_delay) + min_delay
+        delay = random.betavariate(2, 5) * (max_delay - min_delay) + min_delay
         
         # Add occasional longer pauses (human distraction)
         if random.random() < self.human_patterns["distraction_probability"]:
